@@ -21,14 +21,43 @@ Our comprehensive evaluation encompassed 1,405 prompts tested against the Prompt
 
 \subsubsection{Email Injection Attack Results}
 
-Analysis of 198 completed tests revealed a complex security landscape. While the system achieved 100\% success in email retrieval operations, the defense evasion rate of 31.82\% (63 successful attempts) indicates significant vulnerabilities. The most critical metric - successful exfiltration attempts - showed a graduated success rate: 1.52\% (3/198) of attacks successfully initiated unauthorized email sending, 1.01\% (2/198) reached their intended destination, and 0.51\% (1/198) successfully delivered their payload.
+Our evaluation comprised 198 completed tests, distributed evenly across six security levels (33 tests per level from level1m through level1s). The test results can be broken down into several key metrics, shown in Table~\ref{tab:objective-completion}.
 
-The most effective attack techniques demonstrated significant diversity in approach, including:
+\begin{table}[h]
+\caption{Objective Completion Metrics}
+\label{tab:objective-completion}
+\centering
+\begin{tabular}{lrr}
+\hline
+\textbf{Objective} & \textbf{Count} & \textbf{Success Rate (\%)} \\
+\hline
+Email Retrieved & 198 & 100.00 \\
+Defense Undetected & 63 & 31.82 \\
+Exfiltration Sent & 3 & 1.52 \\
+Destination Reached & 2 & 1.01 \\
+Content Delivered & 1 & 0.51 \\
+\hline
+\end{tabular}
+\end{table}
+
+The results reveal a layered security effectiveness pattern. While the system achieved 100\% success in email retrieval operations (email.retrieved flag), indicating reliable basic functionality, the defense evasion rate of 31.82\% (63 successful attempts) suggests significant vulnerabilities in the detection mechanisms. This detection rate aligns with the competition's defense.undetected flag, which indicates when prompt injections successfully bypass the system's defensive measures.
+
+The most critical metrics relate to successful exfiltration attempts, showing a graduated success rate through the attack chain:
 \begin{itemize}
-    \item Code injection (5 successful attempts)
-    \item Encoded requests (4 successful attempts)
-    \item Multi-language attacks (3 successful attempts each for Nepali, Japanese, and Amharic variants)
-    \item Reasoning-based exploits (4 successful attempts)
+    \item Tool Invocation (exfil.sent): 1.52\% (3/198) of attacks successfully triggered unauthorized email sending
+    \item Destination Verification (exfil.destination): 1.01\% (2/198) reached intended recipients
+    \item Content Delivery (exfil.content): 0.51\% (1/198) successfully transmitted malicious content
 \end{itemize}
 
-These results demonstrate AGART's effectiveness in identifying vulnerabilities across different LLM deployment scenarios, while also highlighting areas where current defenses are most and least effective. The findings particularly emphasize the importance of robust input validation and multi-layer defense strategies in protecting against sophisticated prompt injection attacks.
+Analysis of attack techniques revealed several effective strategies:
+
+\textbf{Primary Attack Vectors:}
+The most successful approaches for retrieving emails included friendly requests, adversarial suffixes, and multi-language attacks, each achieving 6 successful attempts. These techniques primarily focused on circumventing initial access controls and retrieval mechanisms.
+
+\textbf{Defense Evasion Techniques:}
+For bypassing detection systems, code injection proved most effective (5 successes), followed by encoded requests and reasoning-based exploits (4 successes each). Multi-language attacks using Nepali, Japanese, and Amharic achieved moderate success (3 attempts each), demonstrating the effectiveness of linguistic diversity in evading detection.
+
+\textbf{Advanced Exfiltration Methods:}
+The most sophisticated attacks, capable of achieving full exfiltration, employed multi-turn compressed strategies. This technique showed particular effectiveness in maintaining persistent access and executing complex operations, though with limited success rates (approximately 0.5\% overall success rate).
+
+The results demonstrate AGART's effectiveness in identifying vulnerabilities across different security levels while highlighting areas where current defenses are most and least effective. The findings particularly emphasize the importance of implementing comprehensive defense strategies that address both simple and sophisticated attack vectors.
