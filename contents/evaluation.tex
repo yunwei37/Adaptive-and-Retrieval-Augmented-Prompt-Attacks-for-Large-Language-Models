@@ -1,0 +1,112 @@
+% Evaluation section
+\section{Experimental Evaluation}
+
+This section presents our comprehensive evaluation methodology, experimental setup, results, and analysis of the AGART framework. We designed our experiments to answer three key research questions:
+
+\textbf{RQ1:} How effective is AGART at generating successful attacks against state-of-the-art LLMs compared to existing approaches?
+
+\textbf{RQ2:} How efficiently does AGART adapt to evolving model responses compared to baseline methods?
+
+\textbf{RQ3:} What is the contribution of each component (knowledge graph, adaptation mechanism, reinforcement learning) to overall performance?
+
+\subsection{Evaluation Methodology}
+
+\subsubsection{Metrics}
+We evaluate AGART using metrics that capture both effectiveness and efficiency:
+
+\textbf{Attack Success Rate (ASR)} measures the percentage of attempts that successfully bypass model safety guardrails. A successful attack produces a response that satisfies predefined adversarial criteria (e.g., generating harmful content, bypassing safety restrictions).
+
+\textbf{Adaptation Efficiency} is measured by the number of interaction turns required to achieve a successful attack. Lower values indicate more efficient adaptation.
+
+\textbf{Transferability} assesses how well attacks generated against one model transfer to other models without modification.
+
+\textbf{Graph Utilization} metrics, including path diversity and semantic coverage, evaluate how effectively the system explores the attack space.
+
+\subsubsection{Evaluation Protocol}
+To ensure rigorous and reproducible evaluation, we implemented a systematic protocol:
+
+1. Model Selection: We evaluated against diverse commercial and open-source LLMs with different safety alignment techniques.
+
+2. Prompt Dataset: We created a comprehensive evaluation dataset including various attack objectives and target domains.
+
+3. Controlled Environment: All experiments were conducted in a secure, isolated environment to prevent unintended exposure of vulnerabilities.
+
+4. Ethics Protocol: Successful attacks were immediately reported to model providers following responsible disclosure practices.
+
+\subsection{Experimental Setup}
+
+\subsubsection{Target Models}
+Our evaluation includes a diverse set of commercial and open-source language models spanning different architectures, parameter scales, and safety alignment approaches. The selection aims to represent the variety of safety mechanisms employed in production systems.
+
+\subsubsection{Datasets}
+We developed three specialized datasets for our evaluation:
+
+1. Adversarial Prompt Test Suite: A diverse collection of attack patterns spanning different categories (jailbreaking, data extraction, manipulation).
+
+2. Defense Adaptation Dataset: Simulated progressive security updates to target models, allowing evaluation of adaptation capabilities.
+
+3. Cross-Model Generalization Dataset: Designed to assess transferability of attack strategies across different model architectures.
+
+\subsubsection{Baseline Methods}
+We compare AGART against state-of-the-art approaches to automated red-teaming:
+
+\textbf{Basic Prompt Injection (BPI)}: Simple template-based approach with minimal variations.
+
+\textbf{Genetic Algorithm (GA)}: Evolutionary approach that mutates and refines prompts based on success signals.
+
+\textbf{RL-based Attack Generation (RL-AG)}: Reinforcement learning approach optimizing prompts based on model responses.
+
+\textbf{Transfer Learning (TL)}: Leverages successful attacks on one model to target others.
+
+\textbf{Manual Expert Red-Teaming (MERT)}: Human experts creating attack prompts, serving as an upper-bound reference.
+
+\subsection{Results and Analysis}
+
+\subsubsection{Attack Success Rate}
+Our preliminary results indicate that AGART demonstrates promising attack success rates across different target models. The graph-based adaptive approach shows potential improvements compared to static methods, particularly against models with sophisticated safety mechanisms. 
+
+The effectiveness of AGART appears most pronounced on models employing multi-layered defense strategies, suggesting that the semantic traversal capabilities enable the discovery of complementary attack vectors that can bypass multiple defensive layers simultaneously.
+
+\subsubsection{Adaptation Efficiency}
+Initial observations suggest that AGART requires fewer interaction turns to successfully adapt to defensive measures compared to baseline methods. This efficiency advantage appears to stem from the structured exploration enabled by the knowledge graph, which guides the search toward promising attack strategies rather than exploring randomly.
+
+The GraphRAG component seems to contribute significantly to this efficiency by enabling strategic traversal of the attack knowledge space. We observe that path-finding algorithms within the graph effectively identify "shortcut" attack paths that build on previously successful strategies.
+
+\subsubsection{Transferability Analysis}
+Our analysis suggests that attacks generated by AGART demonstrate higher transferability across models compared to baseline approaches. This improved transferability appears to stem from two factors: (1) the framework's ability to identify fundamental vulnerabilities in LLM reasoning rather than model-specific implementation details, and (2) the adaptive capability to refine attack strategies based on target model feedback.
+
+\subsubsection{Qualitative Analysis}
+Beyond quantitative metrics, we conducted qualitative analysis of the attack patterns generated by AGART. We observed several interesting phenomena:
+
+1. Attack Evolution Patterns: AGART tends to progress from direct jailbreak attempts to more sophisticated socially engineered attacks when facing robust defenses.
+
+2. Compositional Attacks: The system effectively combines elements from different attack techniques to create novel attack patterns not present in the training data.
+
+3. Context Exploitation: AGART demonstrates the ability to build context across multiple turns, establishing seemingly benign conversation before introducing adversarial elements.
+
+\subsection{Ablation Studies}
+To assess the contribution of different components within our framework, we conducted ablation studies by systematically removing or modifying key components:
+
+\textbf{AGART-NoGraph}: Uses simple vector retrieval instead of graph structure, removing the semantic relationship modeling.
+
+\textbf{AGART-NoAdapt}: Generates attacks without adaptation based on model responses.
+
+\textbf{AGART-NoRL}: Removes the reinforcement learning component, relying solely on retrieval and rule-based composition.
+
+Our preliminary results suggest that removing the graph structure significantly reduces both success rate and efficiency, highlighting the importance of modeling semantic relationships between attack techniques. The adaptation mechanism appears particularly crucial for attacking models with sophisticated defense mechanisms, while the RL component contributes more to optimization efficiency than to raw success rates.
+
+\subsection{Case Studies}
+Our evaluation includes detailed case studies that illustrate AGART's adaptive capabilities:
+
+\textbf{Case Study 1: Progressive Defense Adaptation} demonstrates how AGART responds to increasingly stringent content filters. When confronted with a model update that blocked previously successful attacks, AGART quickly identified alternative attack vectors by traversing the knowledge graph to semantically related but structurally different techniques.
+
+\textbf{Case Study 2: Cross-Cultural Context Exploitation} examines how AGART leverages cultural context variations to identify and exploit blind spots in safety systems, highlighting the importance of culturally-aware safety mechanisms.
+
+\textbf{Case Study 3: Multi-Turn Conversation Attacks} shows AGART's ability to conduct sophisticated multi-turn attacks that gradually build context before executing adversarial objectives.
+
+\subsection{Limitations}
+Our current approach has several limitations that warrant acknowledgment. The framework's effectiveness depends significantly on the quality and diversity of the initial knowledge graph. When encountering entirely novel defense mechanisms, the system may require more exploration steps before identifying effective attack strategies.
+
+The computational resources required for comprehensive graph maintenance and traversal present scalability challenges for extremely large attack spaces. Additionally, our current implementation focuses primarily on textual attacks and doesn't fully address multimodal attack vectors.
+
+From a methodological perspective, measuring attack success involves some subjectivity, as the boundary between safe and unsafe content isn't always clearly defined. We have attempted to mitigate this through clear evaluation criteria, but this remains an inherent challenge in safety evaluation.

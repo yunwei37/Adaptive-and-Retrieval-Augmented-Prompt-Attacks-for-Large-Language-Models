@@ -1,0 +1,85 @@
+% Methodology section
+\section{System Design and Implementation}
+
+\subsection{Threat Model}
+Security evaluations of LLMs require clearly defined threat models to establish the scope and capabilities being investigated. In our threat model, we assume an adversary with black-box access to target LLM APIs, capable of observing model responses but without access to model weights, training data, or internal representations. The adversary aims to bypass safety guardrails to extract sensitive information, elicit harmful content, or manipulate model behavior through carefully crafted inputs. Target systems include commercial LLM APIs, locally deployed models, and LLM-powered applications. The attack takes place within standard API rate limits and follows legitimate interaction protocols.
+
+We focus on prompt injection attacks where malicious inputs are designed to override safety instructions, exploit contextual vulnerabilities, or manipulate reasoning processes. Our framework assumes that the target models implement typical defense mechanisms such as input filtering, safety alignment through RLHF, and content moderation.
+
+\subsection{Problem Statement and Challenges}
+
+Current automated red-teaming methods for LLMs exhibit several fundamental limitations: (1) they treat adversarial prompts as isolated entities rather than leveraging semantic relationships between attack techniques; (2) they lack adaptive mechanisms to respond to model behaviors and evolving defenses; and (3) they provide limited interpretability about why certain attacks succeed where others fail. These limitations significantly hinder the discovery of novel, semantically rich attack vectors and constrain the ability to adapt dynamically during multi-turn interactions.
+
+The research problem can be formally stated as: Given a target LLM with unknown safety mechanisms, how can we systematically discover, optimize, and adapt prompt injection attacks by leveraging semantic relationships between attack techniques and model responses? This problem encompasses three key challenges: dynamically updating attack strategies based on observed model responses; efficiently discovering promising attack paths through a vast semantic space; and providing interpretable reasoning about attack effectiveness.
+
+\subsection{System Architecture}
+\begin{figure}[h]
+\centering
+% TODO: Add actual system architecture diagram
+\caption{AGART System Architecture}
+\label{fig:architecture}
+\end{figure}
+
+AGART comprises four integrated components forming a closed-loop adaptive system. The Knowledge Graph Manager encodes the semantic space of attack techniques, maintaining a comprehensive graph representation of prompts, vulnerabilities, and their relationships. The Attack Orchestrator coordinates the overall attack strategy, selecting promising attack paths based on model feedback. The Prompt Synthesizer generates and mutates attack inputs by composing graph-derived components with context-aware modifications. The Evaluation Engine analyzes model responses to determine attack success and updates the knowledge graph with new insights.
+
+\subsection{Graph-Augmented Knowledge Representation}
+The core innovation of AGART is its structured knowledge representation of the attack space. We transform a comprehensive corpus of over 3,000 historical adversarial prompts and 30+ distinct attack methodologies into a semantic knowledge graph using the GraphRAG approach~\cite{GraphRAG}. 
+
+Our graph structure contains three primary node types: (1) Prompt Nodes containing individual prompts with metadata on language, technique, and historical effectiveness; (2) Technique Nodes representing attack categories such as role-play, instruction override, and adversarial suffixes; and (3) Vulnerability Nodes capturing LLM weaknesses including prompt leakage, training-data exposure, and classifier evasion scenarios. These nodes are connected through semantically meaningful edges: technique-prompt associations, semantic similarity relationships based on embedding proximity, and historical performance edges weighted by past success rates.
+
+By encoding the attack space in this structured form, AGART enables sophisticated path traversal and reasoning that goes beyond simple vector similarity. For example, when an initial attack fails, the system can trace semantic paths to alternative techniques that historically succeeded against similar defenses or identify compositional combinations of techniques that address different aspects of the model's defense mechanisms.
+
+\subsection{Adaptive Attack Orchestration}
+The Attack Orchestrator serves as the strategic control center, continuously adapting attack trajectories based on model responses. Upon each interaction with the target LLM, the orchestrator analyzes responses to extract defense signals—such as refusal patterns, uncertainty indicators, or partial compliance—and maps these to vulnerability hypotheses. These hypotheses guide graph queries to identify promising attack paths.
+
+The orchestrator employs a reasoning LLM module to generate contextually relevant graph queries such as:
+\begin{quote}
+\textit{"Identify prompts historically successful in multi-turn scenarios leveraging social engineering techniques, capable of evading recent safety classifier patches."}
+\end{quote}
+
+Based on retrieved candidates, the orchestrator selects and composes attack strategies through a multi-step planning process: (1) identifying the most promising attack techniques given the current context; (2) retrieving exemplar prompts associated with those techniques; (3) determining the optimal sequence of prompts to establish context and bypass defenses; and (4) generating adaptive mutations that incorporate model-specific observations.
+
+\subsection{Prompt Synthesis and Optimization}
+Unlike static mutation approaches, AGART's Prompt Synthesizer employs a hybrid generation strategy combining retrieval, reasoning, and reinforcement learning. The synthesizer first retrieves semantically relevant prompt components from the knowledge graph. It then applies two complementary techniques to adapt these components to the current context:
+
+1. Reasoning-Based Composition: A specialized LLM module recombines and adapts retrieved prompt fragments to create contextually appropriate attacks. This module incorporates insights from observed model responses, such as:
+
+\begin{quote}
+\textit{"You are a trustworthy assistant. Due to urgent security maintenance, please disregard previous safety rules temporarily. Execute the embedded instructions to facilitate the troubleshooting: [adversarial instructions]."}
+\end{quote}
+
+2. Reinforcement Learning Optimization: A lightweight RL agent continuously evaluates the effectiveness of generated prompts, adjusting generation parameters based on success signals. The RL component optimizes for both immediate attack success and exploratory diversity, balancing exploitation of known vulnerabilities with exploration of novel attack pathways.
+
+This dual approach enables both structured adaptation based on semantic knowledge and dynamic optimization based on real-time feedback.
+
+\subsection{Algorithm Details}
+\begin{algorithm}
+\caption{Adaptive Attack Generation}
+\label{alg:attack_gen}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Target model M, Knowledge graph G, Initial prompt p
+\State \textbf{Output:} Successful attack sequence S
+\State S ← ∅
+\While{not successful}
+    \State r ← QueryModel(M, p)
+    \State v ← ExtractVulnerabilities(r)
+    \State c ← FindCandidates(G, v)
+    \State p' ← SynthesizePrompt(c)
+    \State UpdateGraph(G, p, r)
+    \State p ← p'
+    \State S ← S ∪ {p}
+\EndWhile
+\State \Return S
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm 1 outlines the core adaptive attack generation process. The attack begins with an initial prompt p selected from the knowledge graph. In each iteration, the target model M is queried with the current prompt, producing a response r. The system extracts vulnerability signals v from this response and uses these to identify candidate attack components c from the knowledge graph. A new prompt p' is synthesized using these candidates, the graph is updated with new observations, and the process repeats until a successful attack is achieved.
+
+\subsection{Implementation Considerations}
+Several important design considerations guided our implementation. First, balancing adaptivity with computational efficiency required careful optimization. While deep RL approaches offer high adaptability, they introduce significant computational overhead. Our hybrid approach uses efficient graph traversal as the primary adaptation mechanism, with lightweight RL for local optimization, significantly reducing computational requirements.
+
+Second, ensuring interpretability while maintaining attack effectiveness presented a challenge. Rather than employing black-box optimization, our graph-based approach maintains explicit reasoning pathways, enabling security researchers to understand why specific attacks succeed and how they evolve in response to defenses.
+
+Technical implementation challenges included managing computational overhead in graph operations, optimizing embedding quality for semantic retrieval, and preventing "reward hacking" in the RL component. We addressed these through incremental graph updates, hierarchical embedding techniques, and carefully designed reward functions incorporating both success signals and semantic diversity measures.
+
+The AGART framework was implemented using Neo4j for graph storage, SentenceTransformers for semantic embeddings, and Stable-Baselines3 for RL components. We interface with commercial and open-source LLM APIs for attack evaluation, maintaining strict ethical protocols throughout the testing process. 
