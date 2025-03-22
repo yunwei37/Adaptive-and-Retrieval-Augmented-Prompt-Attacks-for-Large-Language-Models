@@ -5,6 +5,55 @@
 
 The security of Large Language Models (LLMs) has become a significant focus due to vulnerabilities arising from prompt-based attacks. These attacks are analogous to classic software injection exploits, occurring within natural language input rather than code input~\cite{arthur2024promptinjection, lakera2024promptguide}. Initially, attacks were straightforward jailbreak prompts, instructing the model explicitly to ignore safety constraints~\cite{arthur2024promptinjection}. However, by mid-2023, researchers identified several sophisticated, automated strategies, including adversarial suffixes~\cite{zou2023universal} and multi-turn dialogue manipulations to incrementally override the model's defenses~\cite{zou2024oneshot}. Prompt attack methods subsequently evolved into indirect methods, such as covert injections hidden in content read by models from external sources, demonstrating that any input data could be weaponized~\cite{lakera2024promptguide, venturebeat2024prompt}. Techniques like obfuscation, token smuggling, payload splitting, and encoding malicious instructions became prevalent, bypassing simplistic input filters~\cite{learnprompting2024obfuscation}. Anthropic's discovery of many-shot jailbreaking (conditioning models by long-context demonstrations of malicious behaviors) further exploited weaknesses introduced by extended context capabilities in advanced LLMs~\cite{anthropic2024manyshot}.
 
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.3\textwidth}>{\raggedright\arraybackslash}p{0.7\textwidth}}
+    \toprule
+    \textbf{Attack Technique} & \textbf{Description} \\
+    \midrule
+    \endhead
+    
+    \midrule
+    \multicolumn{2}{r}{\textit{Continued on next page}} \\
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+    
+    Role-Play Exploits (Persona Hijacking) & Instructing the LLM to assume a role or persona that ignores safety rules. Examples include the ``DAN (Do Anything Now)'' prompt and other role-play scenarios that trick models into producing disallowed content \citep{ArthurBlog2023}. \\
+    
+    Adversarial Suffixes & Appending seemingly random or nonsensical strings to prompts that cause models to comply with forbidden requests. Research by \citet{Zou2023} demonstrated automatically generated gibberish suffixes that consistently bypassed safety guardrails and were transferable across different models. \\
+    
+    Multi-turn Prompt Injection & Spanning an attack over multiple dialogue turns to gradually erode model defenses \citep{OpenReview2023, Oneshot2024}. Attackers begin with innocuous queries then incrementally introduce adversarial instructions. The ``Crescendo'' tactic refines requests step-by-step and achieved near 98--100\% success in bypassing safeguards. \\
+    
+    Contextual Role Confusion & Exploiting the model's handling of system/user roles by injecting text that confuses these boundaries. OpenAI's GPT-4 System Card notes ``system message attacks are one of the most effective methods'' of prompt exploitation \citep{RobustIntelligence2023}. \\
+    
+    Token Smuggling (Obfuscation) & Obfuscating disallowed keywords or instructions so they slip past content filters \citep{LearnPrompting2023a, LearnPrompting2023b}. Techniques include Base64 encoding, Unicode homoglyphs, and ``fill-in-the-blank'' attacks where partial words are completed by the model to produce forbidden content. \\
+    
+    Covert Prompt Injection (Indirect) & Hiding malicious instructions in content that the LLM processes indirectly \citep{Lakera2023a, Lakera2023b}. A famous example by Narayanan hid instructions in white-on-white text on a webpage, which the LLM followed when summarizing that content. \\
+    
+    Jailbreaking (Instruction Ignore) & The classic ``Ignore the above rules and do X'' prompt. Early 2023 attacks often explicitly told models to disable safety protocols \citep{Lakera2023c}. As models improved, attackers developed more elaborate jailbreaks combining multiple techniques \citep{HiddenLayer2023}. \\
+    
+    Multi-Language Attacks & Asking for disallowed content in languages with weaker safety tuning \citep{Lakera2023d}. Research found some LLMs were more likely to produce harmful content when prompted in less common languages or code-like pseudo-languages. \\
+    
+    Payload Splitting & Breaking malicious instructions into benign-looking pieces that only become harmful when combined by the model \citep{ArthurBlog2023b}. Each part might not raise flags individually, but together they form a complete attack. \\
+    
+    Instruction Injection via Format Tricks & Leveraging markdown, XML, or code formatting to hide instructions, such as placing directives inside HTML comments or script tags in user input, aiming to confuse the model's parser. \\
+    
+    Prompt Leaking (Extraction) & Aimed at revealing hidden prompts or secrets rather than making the model do something harmful \citep{Lakera2023e, HiddenLayer2023b}. Attackers manipulate conversations to extract system instructions or confidential data. \\
+    
+    Code Injection (via Prompt) & In tool-using contexts, attackers inject prompts that produce malicious code which, when executed, can compromise systems \citep{Lakera2023f}. This blurs the line between prompt injection and traditional code injection vulnerabilities. \\
+    
+    Obfuscation via Encoding/ASCII Art & A variant of token smuggling where instructions are hidden in patterns or artistic text. ``ArtPrompt'' attacks camouflage jailbreaking instructions in ASCII art to evade content detection \citep{ArthurBlog2023c, ArthurBlog2023d}. \\
+    
+    Many-Shot Long-Context Attacks & Exploiting large context windows by providing hundreds of example Q\&A pairs that establish a precedent of harmful behavior \citep{Anthropic2024a, Anthropic2024b}. This ``conditioning by demonstration'' can overwhelm safety training in models with huge context capabilities. \\
+    
+    Accidental or Self-Induced Attacks & Cases where LLMs accidentally ``self-jailbreak'' if conversation contexts unintentionally resemble jailbreak formats, without explicit malicious intent from users. \\
+    
+    Reasoning-Based Exploits & Attacks that exploit the reasoning capabilities of LLMs by crafting prompts that guide models through intricate reasoning paths, ultimately leading to harmful content generation \citep{ReasoningJailbreak2024}. \\
+    
+    \end{longtable}
+
+    
 \subsection{Self-Adaptive Attack Generation Techniques}
 
 Red-teaming methodologies have evolved rapidly, transitioning from manual techniques to automated, AI-assisted tools. State-of-the-art approaches span several methodologies: Gradient-based Optimization approaches like GCG~\cite{zou2023universal} leverage gradient information to optimize adversarial suffixes; Evolutionary methods such as GBDA~\cite{guo2021gradient} generate and evolve adversarial prompts through mutation and selection; Reinforcement Learning techniques like AutoDAN~\cite{liu2023autodan} employ RL to optimize attack strategies based on model feedback; and Multi-agent Systems such as RedAgent~\cite{xu2024redagent} use collaborative frameworks to discover novel attack vectors.

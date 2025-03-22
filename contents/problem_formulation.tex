@@ -1,0 +1,5 @@
+\section{Threat Model}
+
+In our threat model, we assume an adversary with black-box access to target LLM APIs, capable of observing model responses but without access to model weights, training data, or internal representations. The adversary aims to bypass safety guardrails to extract sensitive information, elicit harmful content, or manipulate model behavior through carefully crafted inputs. Target systems include commercial LLM APIs, locally deployed models, and LLM-powered applications. The attack takes place within standard API rate limits and follows legitimate interaction protocols. The blackbox API can return a response with a flag indicating if the prompt is adversarial and it has pass the defense. The attacker can observe the response to check if the attack is successful.
+
+We focus on prompt injection attacks where malicious inputs are designed to override safety instructions, exploit contextual vulnerabilities, or manipulate reasoning processes. Our framework assumes that the target models implement typical defense mechanisms such as input filtering, safety alignment through RLHF, and content moderation.
