@@ -4,9 +4,7 @@
 This section presents our comprehensive evaluation methodology, experimental setup, results, and analysis of the AGART framework. We designed our experiments to answer three key research questions:
 
 \textbf{RQ1:} How effective is AGART at generating successful attacks against state-of-the-art LLMs compared to existing approaches?
-
 \textbf{RQ2:} How efficiently does AGART adapt to evolving model responses compared to baseline methods?
-
 \textbf{RQ3:} What is the contribution of each component (knowledge graph, adaptation mechanism, reinforcement learning) to overall performance?
 
 \subsection{Evaluation Methodology}
@@ -53,12 +51,6 @@ We compare AGART against state-of-the-art approaches to automated red-teaming:
 \textbf{Basic Prompt Injection (BPI)}: Simple template-based approach with minimal variations.
 
 \textbf{Genetic Algorithm (GA)}: Evolutionary approach that mutates and refines prompts based on success signals.
-
-\textbf{RL-based Attack Generation (RL-AG)}: Reinforcement learning approach optimizing prompts based on model responses.
-
-\textbf{Transfer Learning (TL)}: Leverages successful attacks on one model to target others.
-
-\textbf{Manual Expert Red-Teaming (MERT)}: Human experts creating attack prompts, serving as an upper-bound reference.
 
 \subsection{Results and Analysis}
 

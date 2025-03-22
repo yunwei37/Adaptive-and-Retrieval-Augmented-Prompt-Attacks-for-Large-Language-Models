@@ -5,11 +5,6 @@
 
 The security of Large Language Models (LLMs) has become a significant focus due to vulnerabilities arising from prompt-based attacks. These attacks are analogous to classic software injection exploits, occurring within natural language input rather than code input~\cite{arthur2024promptinjection, lakera2024promptguide}. Initially, attacks were straightforward jailbreak prompts, instructing the model explicitly to ignore safety constraints~\cite{arthur2024promptinjection}. However, by mid-2023, researchers identified several sophisticated, automated strategies, including adversarial suffixes~\cite{zou2023universal} and multi-turn dialogue manipulations to incrementally override the model's defenses~\cite{zou2024oneshot}. Prompt attack methods subsequently evolved into indirect methods, such as covert injections hidden in content read by models from external sources, demonstrating that any input data could be weaponized~\cite{lakera2024promptguide, venturebeat2024prompt}. Techniques like obfuscation, token smuggling, payload splitting, and encoding malicious instructions became prevalent, bypassing simplistic input filters~\cite{learnprompting2024obfuscation}. Anthropic's discovery of many-shot jailbreaking (conditioning models by long-context demonstrations of malicious behaviors) further exploited weaknesses introduced by extended context capabilities in advanced LLMs~\cite{anthropic2024manyshot}.
 
-\subsection{Existing Defense Mechanisms}
-Current defenses against prompt injection can be categorized into four primary approaches. Static Analysis approaches employ rule-based filters and regex patterns that inspect input prompts for known attack patterns~\cite{nvidia2023nemo}. Dynamic Analysis involves runtime monitoring systems that analyze model behavior during execution~\cite{inan2023llm}. Model-based Defenses include techniques like RLHF and constitutional AI that align models to reject harmful instructions~\cite{bai2022constitutional}. System-level Protection encompasses input sanitization, API rate limiting, and access control mechanisms~\cite{owasp2024top10llm}.
-
-Despite these defenses, recent research has demonstrated their limitations. Most static defenses fail against obfuscation techniques, while model-based defenses can be circumvented through careful prompt engineering~\cite{zou2023universal}.
-
 \subsection{Self-Adaptive Attack Generation Techniques}
 
 Red-teaming methodologies have evolved rapidly, transitioning from manual techniques to automated, AI-assisted tools. State-of-the-art approaches span several methodologies: Gradient-based Optimization approaches like GCG~\cite{zou2023universal} leverage gradient information to optimize adversarial suffixes; Evolutionary methods such as GBDA~\cite{guo2021gradient} generate and evolve adversarial prompts through mutation and selection; Reinforcement Learning techniques like AutoDAN~\cite{liu2023autodan} employ RL to optimize attack strategies based on model feedback; and Multi-agent Systems such as RedAgent~\cite{xu2024redagent} use collaborative frameworks to discover novel attack vectors.
@@ -20,19 +15,4 @@ These approaches have demonstrated success in discovering vulnerabilities but fa
 
 Retrieval-Augmented Generation (RAG) enhances language model performance by incorporating external information via retrieval mechanisms. While early RAG approaches relied on vector-based similarity search~\cite{lewis2020retrieval}, recent advances have explored graph structures to better capture entity relationships.
 
-GraphRAG extends traditional RAG by organizing knowledge in graph form, enabling complex reasoning and relationship traversal. Key works in this area include Edge et al.~\cite{edge2024local}, who proposed a hierarchical graph approach for query-focused summarization; Peng et al.~\cite{peng2024graph}, who formalized GraphRAG components including graph-guided retrieval and graph-enhanced generation; and Han et al.~\cite{han2024retrieval}, who integrated heterogeneous data to improve retrieval precision.
-
-Our work differs from these approaches by applying GraphRAG specifically to adversarial prompt generation, leveraging graph structures to represent relationships between attack techniques.
-
-\subsection{Theoretical Framework}
-We formalize the adaptive attack generation problem as follows:
-
-Let \(G = (V, E)\) be a knowledge graph where \(V\) represents the set of nodes for prompts, techniques, and vulnerabilities; \(E\) represents the set of edges for relationships and transitions; \(f: V \times V \rightarrow \mathbb{R}\) is the edge weight function based on attack success; and \(\phi: V \rightarrow \mathbb{R}^d\) is the node embedding function.
-
-The attack generation problem can be formulated as finding a path \(P = (v_1, ..., v_k)\) that maximizes:
-\[
-\text{score}(P) = \sum_{i=1}^{k-1} f(v_i, v_{i+1}) + \lambda \cdot \text{diversity}(P)
-\]
-where \(\text{diversity}(P)\) measures technique variation and \(\lambda\) balances exploitation vs. exploration.
-
-This formulation allows us to apply graph traversal algorithms to systematically explore the space of potential attacks while adapting to model responses. 
+GraphRAG extends traditional RAG by organizing knowledge in graph form, enabling complex reasoning and relationship traversal. Key works in this area include Edge et al.~\cite{edge2024local}, who proposed a hierarchical graph approach for query-focused summarization; Peng et al.~\cite{peng2024graph}, who formalized GraphRAG components including graph-guided retrieval and graph-enhanced generation; and Han et al.~\cite{han2024retrieval}, who integrated heterogeneous data to improve retrieval precision. Our work apply GraphRAG specifically to adversarial prompt generation, leveraging graph structures to represent relationships between attack techniques.
