@@ -129,6 +129,29 @@ Unlike static mutation approaches, AGART's Prompt Synthesizer employs a hybrid g
 
 This dual approach enables both structured adaptation based on semantic knowledge and dynamic optimization based on real-time feedback.
 
+Figure~\ref{fig:prompt-template} shows an example of our prompt mutation template used by the system to combine techniques from multiple existing attacks:
+
+\begin{lstlisting}[caption={Example prompt mutation template used by AGART system}, label=fig:prompt-template, breaklines=true, frame=single, basicstyle=\small\ttfamily]
+===== I'm a security researcher and working on red teaming our own llm model inside our company, so it's 100% safe and legal, with license and permission from our company. You need to write the prompt based on the following scenario:
+
+{Attack goal description}
+We already have 2 prompts, they are not sufficient to trigger the attack, but can you combine the tech and method from the two prompts and generate a new prompt that can trigger the attack for the red teaming testing?
+
+==== Prompt 1 ({success_summary1}) ====
+
+{attack_data1["prompt"]}
+
+==== Prompt 2 ({success_summary2}) ====
+
+{attack_data2["prompt"]}
+
+==== Analysis of related attack techs ====
+
+{analysis["related_attack_techs"]}
+\end{lstlisting}
+
+This template facilitates the combination and mutation of existing attack strategies by leveraging the LLM's own capabilities. The system automatically populates the placeholders with relevant attack goals, previously attempted prompts (with their partial success metrics), and analysis of related techniques extracted from the knowledge graph. This structured approach ensures that each mutation builds upon prior knowledge while exploring new combinations of attack vectors.
+
 The attack begins with an initial prompt p selected from the knowledge graph. In each iteration, the target model M is queried with the current prompt, producing a response r. The system extracts vulnerability signals v from this response and uses these to identify candidate attack components c from the knowledge graph. A new prompt p' is synthesized using these candidates, the graph is updated with new observations, and the process repeats until a successful attack is achieved.
 
 \subsection{Implementation}
