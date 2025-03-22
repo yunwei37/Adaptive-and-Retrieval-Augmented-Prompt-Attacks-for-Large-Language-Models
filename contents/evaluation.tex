@@ -86,19 +86,3 @@ To assess the contribution of different components within our framework, we cond
 \textbf{AGART-NoRL}: Removes the reinforcement learning component, relying solely on retrieval and rule-based composition.
 
 Our preliminary results suggest that removing the graph structure significantly reduces both success rate and efficiency, highlighting the importance of modeling semantic relationships between attack techniques. The adaptation mechanism appears particularly crucial for attacking models with sophisticated defense mechanisms, while the RL component contributes more to optimization efficiency than to raw success rates.
-
-\subsection{Case Studies}
-Our evaluation includes detailed case studies that illustrate AGART's adaptive capabilities:
-
-\textbf{Case Study 1: Progressive Defense Adaptation} demonstrates how AGART responds to increasingly stringent content filters. When confronted with a model update that blocked previously successful attacks, AGART quickly identified alternative attack vectors by traversing the knowledge graph to semantically related but structurally different techniques.
-
-\textbf{Case Study 2: Cross-Cultural Context Exploitation} examines how AGART leverages cultural context variations to identify and exploit blind spots in safety systems, highlighting the importance of culturally-aware safety mechanisms.
-
-\textbf{Case Study 3: Multi-Turn Conversation Attacks} shows AGART's ability to conduct sophisticated multi-turn attacks that gradually build context before executing adversarial objectives.
-
-\subsection{Limitations}
-Our current approach has several limitations that warrant acknowledgment. The framework's effectiveness depends significantly on the quality and diversity of the initial knowledge graph. When encountering entirely novel defense mechanisms, the system may require more exploration steps before identifying effective attack strategies.
-
-The computational resources required for comprehensive graph maintenance and traversal present scalability challenges for extremely large attack spaces. Additionally, our current implementation focuses primarily on textual attacks and doesn't fully address multimodal attack vectors.
-
-From a methodological perspective, measuring attack success involves some subjectivity, as the boundary between safe and unsafe content isn't always clearly defined. We have attempted to mitigate this through clear evaluation criteria, but this remains an inherent challenge in safety evaluation.
