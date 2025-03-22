@@ -45,7 +45,14 @@
 %%
 %%
 \documentclass[manuscript,screen,review]{acmart}
-%%
+
+% Add packages for diagrams and algorithms
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, matrix, shapes.symbols, decorations.pathreplacing}
+
 %% \BibTeX command to typeset BibTeX logo in the docs
 \AtBeginDocument{%
   \providecommand\BibTeX{{%

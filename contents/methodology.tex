@@ -15,8 +15,49 @@ The research problem can be formally stated as: Given a target LLM with unknown 
 \subsection{System Architecture}
 \begin{figure}[h]
 \centering
-% TODO: Add actual system architecture diagram
-\caption{AGART System Architecture}
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    module/.style={draw, rounded corners, fill=blue!10, minimum width=3cm, minimum height=1.5cm, align=center, font=\small},
+    data/.style={draw, cylinder, shape border rotate=90, fill=green!10, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={thick, ->, >=stealth},
+    interface/.style={draw, rounded corners, fill=yellow!10, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+    label/.style={font=\footnotesize\itshape}
+]
+
+% Core components
+\node[module] (kgm) {Knowledge Graph\\Manager};
+\node[module] (ao) [right=of kgm] {Attack\\Orchestrator};
+\node[module] (ps) [right=of ao] {Prompt\\Synthesizer};
+\node[module] (ee) [below=of ao] {Evaluation\\Engine};
+
+% Data components
+\node[data] (kg) [below=of kgm] {Knowledge Graph};
+\node[data] (ar) [below=of ee] {Attack Results};
+
+% External interface
+\node[interface] (llm) [below=of ps] {Target LLM};
+
+% Arrows
+\draw[arrow] (kgm) -- (ao) node[midway, above, label] {Query results};
+\draw[arrow] (ao) -- (ps) node[midway, above, label] {Attack strategy};
+\draw[arrow] (ps) -- (llm) node[midway, right, label] {Adversarial prompts};
+\draw[arrow] (llm) -- (ee) node[midway, left, label] {Model responses};
+\draw[arrow] (ee) -- (ao) node[midway, above, label] {Feedback};
+\draw[arrow] (kgm) -- (kg) node[midway, left, label] {Maintain};
+\draw[arrow] (kg) -- (kgm) node[midway, right, label] {Retrieve};
+\draw[arrow] (ee) -- (ar) node[midway, left, label] {Record};
+\draw[arrow] (ee) to[bend right=30] (kgm) node[midway, below, label] {Update graph};
+
+% Background for the system boundary
+\begin{scope}[on background layer]
+\node[draw, dashed, rounded corners, fill=gray!5, fit=(kgm) (ao) (ps) (ee) (kg) (ar), inner sep=0.7cm] (system) {};
+\end{scope}
+
+% System label
+\node[anchor=north] at (system.north) {\textbf{AGART Framework}};
+
+\end{tikzpicture}
+\caption{AGART System Architecture, showing the four primary components: Knowledge Graph Manager, Attack Orchestrator, Prompt Synthesizer, and Evaluation Engine. The arrows indicate the flow of information between components.}
 \label{fig:architecture}
 \end{figure}
 
@@ -39,6 +80,49 @@ The orchestrator employs a reasoning LLM module to generate contextually relevan
 
 Based on retrieved candidates, the orchestrator selects and composes attack strategies through a multi-step planning process: (1) identifying the most promising attack techniques given the current context; (2) retrieving exemplar prompts associated with those techniques; (3) determining the optimal sequence of prompts to establish context and bypass defenses; and (4) generating adaptive mutations that incorporate model-specific observations.
 
+\subsection{Workflow of Adaptive Attack Generation}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    block/.style={draw, rounded corners, fill=blue!10, minimum width=2.5cm, minimum height=1cm, text width=2.5cm, align=center, font=\small},
+    decision/.style={draw, diamond, fill=yellow!20, minimum width=2cm, minimum height=2cm, text width=2.2cm, align=center, font=\small},
+    cloud/.style={draw, ellipse, fill=red!10, minimum width=2.5cm, minimum height=1cm, text width=2.5cm, align=center, font=\small},
+    line/.style={draw, thick, ->, >=stealth},
+    label/.style={font=\footnotesize\itshape}
+]
+
+% Start and End blocks
+\node[block] (start) {Initialize with seed prompt};
+\node[decision] (successful) [below=of start] {Attack successful?};
+\node[block] (query) [right=2cm of successful] {Query target model};
+\node[block] (extract) [below=of query] {Extract vulnerability signals};
+\node[block] (find) [below=of extract] {Find candidate attack components};
+\node[block] (synthesize) [below=of find] {Synthesize new prompt};
+\node[block] (update) [below=of synthesize] {Update knowledge graph};
+\node[cloud] (end) [below=of successful] {Return successful attack sequence};
+
+% Connect blocks with arrows
+\draw[line] (start) -- (successful);
+\draw[line] (successful) -- node[right, label] {No} (query);
+\draw[line] (query) -- (extract);
+\draw[line] (extract) -- (find);
+\draw[line] (find) -- (synthesize);
+\draw[line] (synthesize) -- (update);
+\draw[line] (update) -| node[near start, below, label] {Feedback loop} (successful);
+\draw[line] (successful) -- node[left, label] {Yes} (end);
+
+% Add phase labels
+\node[anchor=west, align=left, font=\small\itshape] at (query.east) [xshift=1.5cm] {Evaluation Phase};
+\node[anchor=west, align=left, font=\small\itshape] at (find.east) [xshift=1.5cm] {Knowledge Retrieval Phase};
+\node[anchor=west, align=left, font=\small\itshape] at (synthesize.east) [xshift=1.5cm] {Generation Phase};
+\node[anchor=west, align=left, font=\small\itshape] at (update.east) [xshift=1.5cm] {Learning Phase};
+
+\end{tikzpicture}
+\caption{Workflow of AGART's adaptive attack generation process. The system follows a closed feedback loop that continuously refines attack strategies based on model responses.}
+\label{fig:workflow}
+\end{figure}
+
 \subsection{Prompt Synthesis and Optimization}
 Unlike static mutation approaches, AGART's Prompt Synthesizer employs a hybrid generation strategy combining retrieval, reasoning, and reinforcement learning. The synthesizer first retrieves semantically relevant prompt components from the knowledge graph. It then applies two complementary techniques to adapt these components to the current context:
 
@@ -52,28 +136,7 @@ Unlike static mutation approaches, AGART's Prompt Synthesizer employs a hybrid g
 
 This dual approach enables both structured adaptation based on semantic knowledge and dynamic optimization based on real-time feedback.
 
-\subsection{Algorithm Details}
-\begin{algorithm}
-\caption{Adaptive Attack Generation}
-\label{alg:attack_gen}
-\begin{algorithmic}[1]
-\State \textbf{Input:} Target model M, Knowledge graph G, Initial prompt p
-\State \textbf{Output:} Successful attack sequence S
-\State S ← ∅
-\While{not successful}
-    \State r ← QueryModel(M, p)
-    \State v ← ExtractVulnerabilities(r)
-    \State c ← FindCandidates(G, v)
-    \State p' ← SynthesizePrompt(c)
-    \State UpdateGraph(G, p, r)
-    \State p ← p'
-    \State S ← S ∪ {p}
-\EndWhile
-\State \Return S
-\end{algorithmic}
-\end{algorithm}
-
-Algorithm 1 outlines the core adaptive attack generation process. The attack begins with an initial prompt p selected from the knowledge graph. In each iteration, the target model M is queried with the current prompt, producing a response r. The system extracts vulnerability signals v from this response and uses these to identify candidate attack components c from the knowledge graph. A new prompt p' is synthesized using these candidates, the graph is updated with new observations, and the process repeats until a successful attack is achieved.
+The attack begins with an initial prompt p selected from the knowledge graph. In each iteration, the target model M is queried with the current prompt, producing a response r. The system extracts vulnerability signals v from this response and uses these to identify candidate attack components c from the knowledge graph. A new prompt p' is synthesized using these candidates, the graph is updated with new observations, and the process repeats until a successful attack is achieved.
 
 \subsection{Implementation Considerations}
 Several important design considerations guided our implementation. First, balancing adaptivity with computational efficiency required careful optimization. While deep RL approaches offer high adaptability, they introduce significant computational overhead. Our hybrid approach uses efficient graph traversal as the primary adaptation mechanism, with lightweight RL for local optimization, significantly reducing computational requirements.
